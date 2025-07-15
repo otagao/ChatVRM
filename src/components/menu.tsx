@@ -1,6 +1,6 @@
 import { IconButton } from "./iconButton";
 import { Message } from "@/features/messages/messages";
-import { KoeiroParam } from "@/features/constants/koeiroParam";
+import { AivisParam } from "@/features/constants/aivisParam";
 import { ChatLog } from "./chatLog";
 import React, { useCallback, useContext, useRef, useState } from "react";
 import { Settings } from "./settings";
@@ -11,31 +11,27 @@ type Props = {
   openAiKey: string;
   systemPrompt: string;
   chatLog: Message[];
-  koeiroParam: KoeiroParam;
+  aivisParam: AivisParam;
   assistantMessage: string;
-  koeiromapKey: string;
   onChangeSystemPrompt: (systemPrompt: string) => void;
   onChangeAiKey: (key: string) => void;
   onChangeChatLog: (index: number, text: string) => void;
-  onChangeKoeiromapParam: (param: KoeiroParam) => void;
+  onChangeAivisParam: (param: AivisParam) => void;
   handleClickResetChatLog: () => void;
   handleClickResetSystemPrompt: () => void;
-  onChangeKoeiromapKey: (key: string) => void;
 };
 export const Menu = ({
   openAiKey,
   systemPrompt,
   chatLog,
-  koeiroParam,
+  aivisParam,
   assistantMessage,
-  koeiromapKey,
   onChangeSystemPrompt,
   onChangeAiKey,
   onChangeChatLog,
-  onChangeKoeiromapParam,
+  onChangeAivisParam,
   handleClickResetChatLog,
   handleClickResetSystemPrompt,
-  onChangeKoeiromapKey,
 }: Props) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showChatLog, setShowChatLog] = useState(false);
@@ -56,21 +52,11 @@ export const Menu = ({
     [onChangeAiKey]
   );
 
-  const handleChangeKoeiromapKey = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChangeKoeiromapKey(event.target.value);
+  const handleChangeAivisParam = useCallback(
+    (param: AivisParam) => {
+      onChangeAivisParam(param);
     },
-    [onChangeKoeiromapKey]
-  );
-
-  const handleChangeKoeiroParam = useCallback(
-    (x: number, y: number) => {
-      onChangeKoeiromapParam({
-        speakerX: x,
-        speakerY: y,
-      });
-    },
-    [onChangeKoeiromapParam]
+    [onChangeAivisParam]
   );
 
   const handleClickOpenVrmFile = useCallback(() => {
@@ -132,17 +118,15 @@ export const Menu = ({
           openAiKey={openAiKey}
           chatLog={chatLog}
           systemPrompt={systemPrompt}
-          koeiroParam={koeiroParam}
-          koeiromapKey={koeiromapKey}
+          aivisParam={aivisParam}
           onClickClose={() => setShowSettings(false)}
           onChangeAiKey={handleAiKeyChange}
           onChangeSystemPrompt={handleChangeSystemPrompt}
           onChangeChatLog={onChangeChatLog}
-          onChangeKoeiroParam={handleChangeKoeiroParam}
+          onChangeAivisParam={handleChangeAivisParam}
           onClickOpenVrmFile={handleClickOpenVrmFile}
           onClickResetChatLog={handleClickResetChatLog}
           onClickResetSystemPrompt={handleClickResetSystemPrompt}
-          onChangeKoeiromapKey={handleChangeKoeiromapKey}
         />
       )}
       {!showChatLog && assistantMessage && (

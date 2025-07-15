@@ -1,4 +1,6 @@
-import { koeiromapFreeV1 } from "@/features/koeiromap/koeiromap";
+import { synthesizeWithAivisSpeech } from "@/features/aivisspeech/aivisspeech";
+import { TalkStyle } from "@/features/messages/messages";
+import { AivisParam } from "@/features/constants/aivisParam";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -11,18 +13,14 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const message = req.body.message;
-  const speakerX = req.body.speakerX;
-  const speakerY = req.body.speakerY;
-  const style = req.body.style;
-  const apiKey = req.body.apiKey;
+  const aivisParam: AivisParam = req.body.aivisParam;
+  const style: TalkStyle = req.body.style;
 
-  const voice = await koeiromapFreeV1(
-    message,
-    speakerX,
-    speakerY,
-    style,
-    apiKey
-  );
-
-  res.status(200).json(voice);
+  try {
+    const voice = await synthesizeWithAivisSpeech(message, aivisParam, style);
+    res.status(200).json(voice);
+  } catch (error) {
+    console.error("TTS API error:", error);
+    res.status(500).json({ audio: "" });
+  }
 }

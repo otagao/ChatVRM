@@ -9,7 +9,7 @@ import {
 import { speakCharacter } from "@/features/messages/speakCharacter";
 import { MessageInputContainer } from "@/components/messageInputContainer";
 import { SYSTEM_PROMPT } from "@/features/constants/systemPromptConstants";
-import { KoeiroParam, DEFAULT_PARAM } from "@/features/constants/koeiroParam";
+import { AivisParam, DEFAULT_AIVIS_PARAM } from "@/features/constants/aivisParam";
 import { getChatResponseStream } from "@/features/chat/openAiChat";
 import { Introduction } from "@/components/introduction";
 import { Menu } from "@/components/menu";
@@ -21,8 +21,7 @@ export default function Home() {
 
   const [systemPrompt, setSystemPrompt] = useState(SYSTEM_PROMPT);
   const [openAiKey, setOpenAiKey] = useState("");
-  const [koeiromapKey, setKoeiromapKey] = useState("");
-  const [koeiroParam, setKoeiroParam] = useState<KoeiroParam>(DEFAULT_PARAM);
+  const [aivisParam, setAivisParam] = useState<AivisParam>(DEFAULT_AIVIS_PARAM);
   const [chatProcessing, setChatProcessing] = useState(false);
   const [chatLog, setChatLog] = useState<Message[]>([]);
   const [assistantMessage, setAssistantMessage] = useState("");
@@ -33,7 +32,7 @@ export default function Home() {
         window.localStorage.getItem("chatVRMParams") as string
       );
       setSystemPrompt(params.systemPrompt ?? SYSTEM_PROMPT);
-      setKoeiroParam(params.koeiroParam ?? DEFAULT_PARAM);
+      setAivisParam(params.aivisParam ?? DEFAULT_AIVIS_PARAM);
       setChatLog(params.chatLog ?? []);
     }
   }, []);
@@ -42,10 +41,10 @@ export default function Home() {
     process.nextTick(() =>
       window.localStorage.setItem(
         "chatVRMParams",
-        JSON.stringify({ systemPrompt, koeiroParam, chatLog })
+        JSON.stringify({ systemPrompt, aivisParam, chatLog })
       )
     );
-  }, [systemPrompt, koeiroParam, chatLog]);
+  }, [systemPrompt, aivisParam, chatLog]);
 
   const handleChangeChatLog = useCallback(
     (targetIndex: number, text: string) => {
@@ -67,9 +66,9 @@ export default function Home() {
       onStart?: () => void,
       onEnd?: () => void
     ) => {
-      speakCharacter(screenplay, viewer, koeiromapKey, onStart, onEnd);
+      speakCharacter(screenplay, viewer, aivisParam, onStart, onEnd);
     },
-    [viewer, koeiromapKey]
+    [viewer, aivisParam]
   );
 
   /**
@@ -155,7 +154,7 @@ export default function Home() {
             }
 
             const aiText = `${tag} ${sentence}`;
-            const aiTalks = textsToScreenplay([aiText], koeiroParam);
+            const aiTalks = textsToScreenplay([aiText]);
             aiTextLog += aiText;
 
             // 文ごとに音声を生成 & 再生、返答を表示
@@ -181,7 +180,7 @@ export default function Home() {
       setChatLog(messageLogAssistant);
       setChatProcessing(false);
     },
-    [systemPrompt, chatLog, handleSpeakAi, openAiKey, koeiroParam]
+    [systemPrompt, chatLog, handleSpeakAi, openAiKey, aivisParam]
   );
 
   return (
@@ -189,9 +188,7 @@ export default function Home() {
       <Meta />
       <Introduction
         openAiKey={openAiKey}
-        koeiroMapKey={koeiromapKey}
         onChangeAiKey={setOpenAiKey}
-        onChangeKoeiromapKey={setKoeiromapKey}
       />
       <VrmViewer />
       <MessageInputContainer
@@ -202,16 +199,14 @@ export default function Home() {
         openAiKey={openAiKey}
         systemPrompt={systemPrompt}
         chatLog={chatLog}
-        koeiroParam={koeiroParam}
+        aivisParam={aivisParam}
         assistantMessage={assistantMessage}
-        koeiromapKey={koeiromapKey}
         onChangeAiKey={setOpenAiKey}
         onChangeSystemPrompt={setSystemPrompt}
         onChangeChatLog={handleChangeChatLog}
-        onChangeKoeiromapParam={setKoeiroParam}
+        onChangeAivisParam={setAivisParam}
         handleClickResetChatLog={() => setChatLog([])}
         handleClickResetSystemPrompt={() => setSystemPrompt(SYSTEM_PROMPT)}
-        onChangeKoeiromapKey={setKoeiromapKey}
       />
       <GitHubLink />
     </div>

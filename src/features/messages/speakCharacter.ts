@@ -3,6 +3,7 @@ import { synthesizeVoiceApi } from "./synthesizeVoice";
 import { Viewer } from "../vrmViewer/viewer";
 import { Screenplay } from "./messages";
 import { Talk } from "./messages";
+import { AivisParam } from "../constants/aivisParam";
 
 const createSpeakCharacter = () => {
   let lastTime = 0;
@@ -12,7 +13,7 @@ const createSpeakCharacter = () => {
   return (
     screenplay: Screenplay,
     viewer: Viewer,
-    koeiroApiKey: string,
+    aivisParam: AivisParam,
     onStart?: () => void,
     onComplete?: () => void
   ) => {
@@ -22,7 +23,7 @@ const createSpeakCharacter = () => {
         await wait(1000 - (now - lastTime));
       }
 
-      const buffer = await fetchAudio(screenplay.talk, koeiroApiKey).catch(
+      const buffer = await fetchAudio(screenplay.talk, aivisParam).catch(
         () => null
       );
       lastTime = Date.now();
@@ -49,22 +50,25 @@ export const speakCharacter = createSpeakCharacter();
 
 export const fetchAudio = async (
   talk: Talk,
-  apiKey: string
+  aivisParam: AivisParam
 ): Promise<ArrayBuffer> => {
   const ttsVoice = await synthesizeVoiceApi(
     talk.message,
-    talk.speakerX,
-    talk.speakerY,
-    talk.style,
-    apiKey
+    aivisParam,
+    talk.style
   );
-  const url = ttsVoice.audio;
+  const base64Audio = ttsVoice.audio;
 
-  if (url == null) {
+  if (base64Audio == null) {
     throw new Error("Something went wrong");
   }
 
-  const resAudio = await fetch(url);
-  const buffer = await resAudio.arrayBuffer();
-  return buffer;
+  // Convert base64 to ArrayBuffer
+  const binaryString = atob(base64Audio);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
 };

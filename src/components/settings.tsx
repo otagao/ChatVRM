@@ -3,45 +3,41 @@ import { IconButton } from "./iconButton";
 import { TextButton } from "./textButton";
 import { Message } from "@/features/messages/messages";
 import {
-  KoeiroParam,
-  PRESET_A,
-  PRESET_B,
-  PRESET_C,
-  PRESET_D,
-} from "@/features/constants/koeiroParam";
+  AivisParam,
+  AIVIS_PRESET_A,
+  AIVIS_PRESET_B,
+  AIVIS_PRESET_C,
+  AIVIS_PRESET_D,
+} from "@/features/constants/aivisParam";
 import { Link } from "./link";
 
 type Props = {
   openAiKey: string;
   systemPrompt: string;
   chatLog: Message[];
-  koeiroParam: KoeiroParam;
-  koeiromapKey: string;
+  aivisParam: AivisParam;
   onClickClose: () => void;
   onChangeAiKey: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onChangeSystemPrompt: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onChangeChatLog: (index: number, text: string) => void;
-  onChangeKoeiroParam: (x: number, y: number) => void;
+  onChangeAivisParam: (param: AivisParam) => void;
   onClickOpenVrmFile: () => void;
   onClickResetChatLog: () => void;
   onClickResetSystemPrompt: () => void;
-  onChangeKoeiromapKey: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 export const Settings = ({
   openAiKey,
   chatLog,
   systemPrompt,
-  koeiroParam,
-  koeiromapKey,
+  aivisParam,
   onClickClose,
   onChangeSystemPrompt,
   onChangeAiKey,
   onChangeChatLog,
-  onChangeKoeiroParam,
+  onChangeAivisParam,
   onClickOpenVrmFile,
   onClickResetChatLog,
   onClickResetSystemPrompt,
-  onChangeKoeiromapKey,
 }: Props) => {
   return (
     <div className="absolute z-40 w-full h-full bg-white/80 backdrop-blur ">
@@ -76,7 +72,7 @@ export const Settings = ({
               ChatGPT
               APIはブラウザから直接アクセスしています。また、APIキーや会話内容はピクシブのサーバには保存されません。
               <br />
-              ※利用しているモデルはChatGPT API (GPT-3.5)です。
+              ※利用しているモデルはChatGPT API (GPT-4o)です。
             </div>
           </div>
           <div className="my-40">
@@ -106,86 +102,103 @@ export const Settings = ({
           <div className="my-40">
             <div className="my-16 typography-20 font-bold">声の調整</div>
             <div>
-              KoemotionのKoeiromap APIを使用しています。詳しくは
+              AivisSpeech Engine (https://aivis-project.github.io/AivisSpeech-Engine/api/) を使用しています。
+              <br />
+              <span className="text-red-500 font-bold">
+                ⚠️ AivisSpeech Engineがローカル環境（http://127.0.0.1:10101）で起動していることを確認してください。
+              </span>
+              <br />
+              詳しくは
               <Link
-                url="https://koemotion.rinna.co.jp"
-                label="https://koemotion.rinna.co.jp"
+                url="https://aivis-project.com/"
+                label="公式サイト"
               />
               をご覧ください。
-            </div>
-            <div className="mt-16 font-bold">API キー</div>
-            <div className="mt-8">
-              <input
-                className="text-ellipsis px-16 py-8 w-col-span-2 bg-surface1 hover:bg-surface1-hover rounded-8"
-                type="text"
-                placeholder="..."
-                value={koeiromapKey}
-                onChange={onChangeKoeiromapKey}
-              />
             </div>
 
             <div className="mt-16 font-bold">プリセット</div>
             <div className="my-8 grid grid-cols-2 gap-[8px]">
               <TextButton
-                onClick={() =>
-                  onChangeKoeiroParam(PRESET_A.speakerX, PRESET_A.speakerY)
-                }
+                onClick={() => onChangeAivisParam(AIVIS_PRESET_A)}
               >
-                かわいい
+                標準
               </TextButton>
               <TextButton
-                onClick={() =>
-                  onChangeKoeiroParam(PRESET_B.speakerX, PRESET_B.speakerY)
-                }
+                onClick={() => onChangeAivisParam(AIVIS_PRESET_B)}
+              >
+                通常
+              </TextButton>
+              <TextButton
+                onClick={() => onChangeAivisParam(AIVIS_PRESET_C)}
               >
                 元気
               </TextButton>
               <TextButton
-                onClick={() =>
-                  onChangeKoeiroParam(PRESET_C.speakerX, PRESET_C.speakerY)
-                }
+                onClick={() => onChangeAivisParam(AIVIS_PRESET_D)}
               >
-                かっこいい
-              </TextButton>
-              <TextButton
-                onClick={() =>
-                  onChangeKoeiroParam(PRESET_D.speakerX, PRESET_D.speakerY)
-                }
-              >
-                渋い
+                落ち着き
               </TextButton>
             </div>
             <div className="my-24">
-              <div className="select-none">x : {koeiroParam.speakerX}</div>
+              <div className="select-none">話者ID : {aivisParam.speaker}</div>
+              <input
+                type="number"
+                min={0}
+                max={999999999}
+                value={aivisParam.speaker}
+                className="mt-8 mb-16 px-16 py-8 w-full bg-surface1 hover:bg-surface1-hover rounded-8"
+                onChange={(e) => {
+                  onChangeAivisParam({
+                    ...aivisParam,
+                    speaker: Number(e.target.value)
+                  });
+                }}
+              />
+              <div className="select-none">速度 : {aivisParam.speedScale}</div>
               <input
                 type="range"
-                min={-10}
-                max={10}
-                step={0.001}
-                value={koeiroParam.speakerX}
+                min={0.5}
+                max={2.0}
+                step={0.1}
+                value={aivisParam.speedScale}
                 className="mt-8 mb-16 input-range"
                 onChange={(e) => {
-                  onChangeKoeiroParam(
-                    Number(e.target.value),
-                    koeiroParam.speakerY
-                  );
+                  onChangeAivisParam({
+                    ...aivisParam,
+                    speedScale: Number(e.target.value)
+                  });
                 }}
-              ></input>
-              <div className="select-none">y : {koeiroParam.speakerY}</div>
+              />
+              <div className="select-none">音高 : {aivisParam.pitchScale}</div>
               <input
                 type="range"
-                min={-10}
-                max={10}
-                step={0.001}
-                value={koeiroParam.speakerY}
+                min={-0.5}
+                max={0.5}
+                step={0.1}
+                value={aivisParam.pitchScale}
                 className="mt-8 mb-16 input-range"
                 onChange={(e) => {
-                  onChangeKoeiroParam(
-                    koeiroParam.speakerX,
-                    Number(e.target.value)
-                  );
+                  onChangeAivisParam({
+                    ...aivisParam,
+                    pitchScale: Number(e.target.value)
+                  });
                 }}
-              ></input>
+              />
+              <div className="select-none">抑揚 : {aivisParam.intonationScale}</div>
+              <input
+                type="range"
+                min={0.0}
+                max={2.0}
+                step={0.1}
+                value={aivisParam.intonationScale}
+                className="mt-8 mb-16 input-range"
+                onChange={(e) => {
+                  onChangeAivisParam({
+                    ...aivisParam,
+                    intonationScale: Number(e.target.value)
+                  });
+                }}
+              />
             </div>
           </div>
           {chatLog.length > 0 && (

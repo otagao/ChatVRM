@@ -1,33 +1,25 @@
-import { reduceTalkStyle } from "@/utils/reduceTalkStyle";
-import { koeiromapV0 } from "../koeiromap/koeiromap";
+import { synthesizeWithAivisSpeech } from "../aivisspeech/aivisspeech";
 import { TalkStyle } from "../messages/messages";
+import { AivisParam } from "../constants/aivisParam";
 
 export async function synthesizeVoice(
   message: string,
-  speakerX: number,
-  speakerY: number,
+  aivisParam: AivisParam,
   style: TalkStyle
 ) {
-  const koeiroRes = await koeiromapV0(message, speakerX, speakerY, style);
-  return { audio: koeiroRes.audio };
+  const aivisRes = await synthesizeWithAivisSpeech(message, aivisParam, style);
+  return { audio: aivisRes.audio };
 }
 
 export async function synthesizeVoiceApi(
   message: string,
-  speakerX: number,
-  speakerY: number,
-  style: TalkStyle,
-  apiKey: string
+  aivisParam: AivisParam,
+  style: TalkStyle
 ) {
-  // Free向けに感情を制限する
-  const reducedStyle = reduceTalkStyle(style);
-
   const body = {
     message: message,
-    speakerX: speakerX,
-    speakerY: speakerY,
-    style: reducedStyle,
-    apiKey: apiKey,
+    aivisParam: aivisParam,
+    style: style,
   };
 
   const res = await fetch("/api/tts", {
